@@ -82,3 +82,19 @@ function showSidebar(){
       const sidebar = document.querySelector('.sidebar')
       sidebar.style.display = 'none'
     }
+
+let lastScroll = 0;
+  const footer = document.querySelector('.footer-container');
+
+  window.addEventListener('scroll', () => {
+    const currentScroll = window.pageYOffset;
+
+    if (currentScroll > lastScroll) {
+      
+      footer.classList.add('visible');
+    } else {
+      footer.classList.remove('visible');
+    }
+
+    lastScroll = currentScroll;
+  });
