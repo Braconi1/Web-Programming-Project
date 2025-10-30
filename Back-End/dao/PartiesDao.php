@@ -2,15 +2,29 @@
 require_once 'BaseDao.php';
 
 class PartiesDao extends BaseDao {
+
     public function __construct() {
-        parent::__construct('Parties');
+        parent::__construct("parties");
     }
 
-    public function getByName($name) {
-        $stmt = $this->connection->prepare("SELECT * FROM Parties WHERE party_name = :name");
-        $stmt->bindParam(':name', $name);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+    public function getPartyById($id) {
+        return $this->getById($id, 'party_id');
+    }
+
+    public function addParty($data) {
+        return $this->insert($data);
+    }
+
+    public function updateParty($id, $data) {
+        return $this->update($id, $data, 'party_id');
+    }
+
+    public function deleteParty($id) {
+        return $this->delete($id, 'party_id');
+    }
+
+    public function getAllParties() {
+        return $this->getAll();
     }
 }
 ?>

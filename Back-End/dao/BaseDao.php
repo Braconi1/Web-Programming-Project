@@ -13,14 +13,14 @@ class BaseDao {
     public function getAll() {
         $stmt = $this->connection->prepare("SELECT * FROM " . $this->table);
         $stmt->execute();
-        return $stmt->fetchAll();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getById($idColumn, $id) {
-        $stmt = $this->connection->prepare("SELECT * FROM " . $this->table . " WHERE $idColumn = :id");
+    public function getById($id, $column = 'id') {
+        $stmt = $this->connection->prepare("SELECT * FROM " . $this->table . " WHERE $column = :id");
         $stmt->bindParam(':id', $id);
         $stmt->execute();
-        return $stmt->fetch();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function insert($data) {
@@ -28,23 +28,24 @@ class BaseDao {
         $placeholders = ":" . implode(", :", array_keys($data));
         $sql = "INSERT INTO " . $this->table . " ($columns) VALUES ($placeholders)";
         $stmt = $this->connection->prepare($sql);
-        return $stmt->execute($data);
+        $stmt->execute($data);
+        return $this->connection->lastInsertId();
     }
 
-    public function update($idColumn, $id, $data) {
+    public function update($id, $data, $column = 'id') {
         $fields = "";
         foreach ($data as $key => $value) {
             $fields .= "$key = :$key, ";
         }
         $fields = rtrim($fields, ", ");
-        $sql = "UPDATE " . $this->table . " SET $fields WHERE $idColumn = :id";
+        $sql = "UPDATE " . $this->table . " SET $fields WHERE $column = :id";
         $stmt = $this->connection->prepare($sql);
         $data['id'] = $id;
         return $stmt->execute($data);
     }
 
-    public function delete($idColumn, $id) {
-        $stmt = $this->connection->prepare("DELETE FROM " . $this->table . " WHERE $idColumn = :id");
+    public function delete($id, $column = 'id') {
+        $stmt = $this->connection->prepare("DELETE FROM " . $this->table . " WHERE $column = :id");
         $stmt->bindParam(':id', $id);
         return $stmt->execute();
     }
