@@ -15,6 +15,7 @@ $(document).ready(function() {
   app.route({ view: "contact", load: "contact.html" });
   app.route({ view: "login", load: "login.html" });
   app.route({ view: "sign-up", load: "sign-up.html" });
+  app.route({ view: "admin-panel", load: "admin-panel.html" });
 
   app.run();
 });
