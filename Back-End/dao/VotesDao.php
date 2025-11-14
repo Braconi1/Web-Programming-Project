@@ -28,14 +28,21 @@ class VotesDao extends BaseDao {
     }
 
     public function countVotesByCandidate($candidate_id) {
-        $stmt = $this->connection->prepare("SELECT COUNT(*) AS total FROM votes WHERE candidate_id = :candidate_id");
-        $stmt->execute([':candidate_id' => $candidate_id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $sql = "SELECT COUNT(*) AS total FROM votes WHERE candidate_id = :cid";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':cid' => $candidate_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+    }
+
+    public function countVotesByUser($user_id) {
+        $sql = "SELECT COUNT(*) AS total FROM votes WHERE user_id = :uid";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':uid' => $user_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
     }
 
     public function resetVotes() {
-        $stmt = $this->connection->prepare("TRUNCATE TABLE votes");
+        $stmt = $this->conn->prepare("TRUNCATE TABLE votes");
         return $stmt->execute();
     }
 }
-?>
