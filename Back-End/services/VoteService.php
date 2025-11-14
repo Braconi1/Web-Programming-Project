@@ -1,27 +1,30 @@
 <?php
 require_once __DIR__ . '/../dao/VotesDao.php';
+require_once 'BaseService.php';
 
-class VoteService {
-    private $dao;
+class VoteService extends BaseService {
 
     public function __construct() {
-        $this->dao = new VotesDao();
+        parent::__construct(new VotesDao());
     }
 
-    public function getAll() {
-        return $this->dao->getAll();
+    public function addVote($data) {
+        return $this->dao->addVote($data);
     }
 
-    public function getById($id) {
-        return $this->dao->getById($id);
+    public function hasVoted($user_id) {
+        return $this->dao->countVotesByUser($user_id) > 0;
     }
 
-    public function add($data) {
-        return $this->dao->add($data);
+    public function countForCandidate($candidate_id) {
+        return $this->dao->countVotesByCandidate($candidate_id);
     }
 
-    public function delete($id) {
-        return $this->dao->delete($id);
+    public function resetVotes() {
+        return $this->dao->resetVotes();
+    }
+
+    public function getReport() {
+        return $this->dao->getVoteDetails();
     }
 }
-?>

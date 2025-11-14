@@ -1,44 +1,98 @@
 <?php
-require_once __DIR__ . '/../services/UsersService.php';
+require_once __DIR__ . '/../services/PartiesService.php';
 
+/**
+ * @OA\Tag(
+ *     name="Parties",
+ *     description="Endpoints for political parties"
+ * )
+ */
 
+Flight::group('/parties', function() {
 
-Flight::group('/users', function() {
+    $service = new PartiesService();
 
-    Flight::route('GET /', function() {
-        $service = new UsersService();
-        Flight::json($service->getAllUsers());
+    /**
+     * @OA\Get(
+     *     path="/parties",
+     *     tags={"Parties"},
+     *     summary="Get all parties",
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of parties",
+     *         @OA\JsonContent(type="array", @OA\Items(type="object"))
+     *     )
+     * )
+     */
+    Flight::route('GET /', function() use ($service) {
+        Flight::json($service->getAll());
     });
 
-    Flight::route('GET /@id', function($id) {
-        $service = new UsersService();
-        Flight::json($service->getUserById($id));
-    });
-
-
-    Flight::route('POST /register', function() {
+    /**
+     * @OA\Post(
+     *     path="/parties",
+     *     tags={"Parties"},
+     *     summary="Add new party",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"party_name"},
+     *             @OA\Property(property="party_name", type="string", example="SDA"),
+     *             @OA\Property(property="logo", type="string", example="sda.png")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Party added")
+     * )
+     */
+    Flight::route('POST /', function() use ($service) {
         $data = Flight::request()->data->getData();
-        $service = new UsersService();
-        Flight::json($service->registerUser($data));
+        Flight::json($service->addParty($data));
     });
 
-
-    Flight::route('POST /login', function() {
+    /**
+     * @OA\Put(
+     *     path="/parties/{id}",
+     *     tags={"Parties"},
+     *     summary="Update party",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the party",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="party_name", type="string", example="Updated Party"),
+     *             @OA\Property(property="logo", type="string", example="updated_logo.png")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Party updated")
+     * )
+     */
+    Flight::route('PUT /@id', function($id) use ($service) {
         $data = Flight::request()->data->getData();
-        $service = new UsersService();
-        Flight::json($service->loginUser($data['email'], $data['password']));
+        Flight::json($service->updateParty($id, $data));
     });
 
-
-    Flight::route('PUT /@id', function($id) {
-        $data = Flight::request()->data->getData();
-        $service = new UsersService();
-        Flight::json($service->updateUser($id, $data));
+    /**
+     * @OA\Delete(
+     *     path="/parties/{id}",
+     *     tags={"Parties"},
+     *     summary="Delete party",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+ *         required=true,
+ *         description="ID of the party to delete",
+ *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(response=200, description="Party deleted")
+     * )
+     */
+    Flight::route('DELETE /@id', function($id) use ($service) {
+        Flight::json($service->deleteParty($id));
     });
 
-    Flight::route('DELETE /@id', function($id) {
-        $service = new UsersService();
-        Flight::json($service->deleteUser($id));
-    });
 });
-?>

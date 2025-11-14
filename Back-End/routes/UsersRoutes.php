@@ -10,6 +10,8 @@ require_once __DIR__ . '/../services/UsersService.php';
 
 Flight::group('/users', function() {
 
+    $service = new UsersService();
+
     /**
      * @OA\Get(
      *     path="/users",
@@ -30,8 +32,7 @@ Flight::group('/users', function() {
      *     )
      * )
      */
-    Flight::route('GET /', function() {
-        $service = new UsersService();
+    Flight::route('GET /', function() use ($service) {
         Flight::json($service->getAllUsers());
     });
 
@@ -60,8 +61,7 @@ Flight::group('/users', function() {
      *     @OA\Response(response=404, description="User not found")
      * )
      */
-    Flight::route('GET /@id', function($id) {
-        $service = new UsersService();
+    Flight::route('GET /@id', function($id) use ($service) {
         Flight::json($service->getUserById($id));
     });
 
@@ -85,9 +85,8 @@ Flight::group('/users', function() {
      *     @OA\Response(response=400, description="Invalid input data")
      * )
      */
-    Flight::route('POST /register', function() {
+    Flight::route('POST /register', function() use ($service) {
         $data = Flight::request()->data->getData();
-        $service = new UsersService();
         Flight::json($service->registerUser($data));
     });
 
@@ -109,9 +108,8 @@ Flight::group('/users', function() {
      *     @OA\Response(response=401, description="Invalid email or password")
      * )
      */
-    Flight::route('POST /login', function() {
+    Flight::route('POST /login', function() use ($service) {
         $data = Flight::request()->data->getData();
-        $service = new UsersService();
         Flight::json($service->loginUser($data['email'], $data['password']));
     });
 
@@ -139,9 +137,8 @@ Flight::group('/users', function() {
      *     @OA\Response(response=404, description="User not found")
      * )
      */
-    Flight::route('PUT /@id', function($id) {
+    Flight::route('PUT /@id', function($id) use ($service) {
         $data = Flight::request()->data->getData();
-        $service = new UsersService();
         Flight::json($service->updateUser($id, $data));
     });
 
@@ -162,8 +159,7 @@ Flight::group('/users', function() {
      *     @OA\Response(response=404, description="User not found")
      * )
      */
-    Flight::route('DELETE /@id', function($id) {
-        $service = new UsersService();
+    Flight::route('DELETE /@id', function($id) use ($service) {
         Flight::json($service->deleteUser($id));
     });
 });

@@ -9,6 +9,7 @@ require_once __DIR__ . '/../services/VoteService.php';
  */
 
 Flight::group('/votes', function() {
+    $service = new VoteService();
 
     /**
      * @OA\Get(
@@ -31,8 +32,7 @@ Flight::group('/votes', function() {
      *     )
      * )
      */
-    Flight::route('GET /', function() {
-        $service = new VoteService();
+    Flight::route('GET /', function() use ($service) {
         Flight::json($service->getAll());
     });
 
@@ -62,8 +62,7 @@ Flight::group('/votes', function() {
      *     @OA\Response(response=404, description="Vote not found")
      * )
      */
-    Flight::route('GET /@id', function($id) {
-        $service = new VoteService();
+    Flight::route('GET /@id', function($id) use ($service) {
         Flight::json($service->getById($id));
     });
 
@@ -86,9 +85,8 @@ Flight::group('/votes', function() {
      *     @OA\Response(response=400, description="Invalid or duplicate vote")
      * )
      */
-    Flight::route('POST /', function() {
+    Flight::route('POST /', function() use ($service) {
         $data = Flight::request()->data->getData();
-        $service = new VoteService();
         Flight::json($service->add($data));
     });
 
@@ -109,8 +107,7 @@ Flight::group('/votes', function() {
      *     @OA\Response(response=404, description="Vote not found")
      * )
      */
-    Flight::route('DELETE /@id', function($id) {
-        $service = new VoteService();
+    Flight::route('DELETE /@id', function($id) use ($service) {
         Flight::json($service->delete($id));
     });
 });

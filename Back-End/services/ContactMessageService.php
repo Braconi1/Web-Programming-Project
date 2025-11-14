@@ -1,27 +1,33 @@
 <?php
 require_once __DIR__ . '/../dao/ContactMessagesDao.php';
+require_once 'BaseService.php';
 
-class ContactMessageService {
-    private $dao;
-
+class ContactMessageService extends BaseService {
     public function __construct() {
-        $this->dao = new ContactMessagesDao();
+        parent::__construct(new ContactMessagesDao());
     }
 
-    public function getAll() {
+    public function addMessage($data) {
+        return $this->dao->insert($data);
+    }
+
+    public function getAllMessages() {
         return $this->dao->getAll();
     }
 
-    public function getById($id) {
-        return $this->dao->getById($id);
+    public function deleteMessage($id) {
+        return $this->dao->delete($id, "message_id");
     }
 
-    public function add($data) {
-        return $this->dao->add($data);
+    public function search($keyword) {
+        return $this->dao->search($keyword);
     }
 
-    public function delete($id) {
-        return $this->dao->delete($id);
+    public function getByEmail($email) {
+        return $this->dao->getByEmail($email);
+    }
+
+    public function clearAll() {
+        return $this->dao->clear();
     }
 }
-?>
