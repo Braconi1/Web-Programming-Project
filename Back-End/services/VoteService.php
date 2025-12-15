@@ -9,12 +9,18 @@ class VoteService extends BaseService {
     }
 
     public function addVote($data) {
-        return $this->dao->addVote($data);
+    $voteData = [
+        'user_id' => $data['user_id'],
+        'candidate_id' => $data['candidate_id']
+    ];
+    return $this->dao->addVote($voteData);
     }
+
 
     public function hasVoted($user_id) {
         return $this->dao->countVotesByUser($user_id) > 0;
     }
+
 
     public function countForCandidate($candidate_id) {
         return $this->dao->countVotesByCandidate($candidate_id);
@@ -25,6 +31,23 @@ class VoteService extends BaseService {
     }
 
     public function getReport() {
-        return $this->dao->getVoteDetails();
+        return $this->dao->getVoteDetailsWithParty(); // Join
+    }
+
+    public function getVotingReport(){
+        return $this->dao->getVotingReport();
+    }
+
+    public function countVotesByUser($user_id) {
+        return $this->dao->countVotesByUser($user_id);
+    }
+
+    public function getById($id, $col = 'vote_id') {
+        return $this->dao->getVoteWithPartyById($id);
+    }
+
+    public function delete($id, $col = 'vote_id') {
+        return $this->dao->delete($id, "vote_id");
     }
 }
+?>

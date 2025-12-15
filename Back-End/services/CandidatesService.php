@@ -11,4 +11,13 @@ class CandidatesService extends BaseService {
     public function uploadImage($id, $fileName) {
         return $this->dao->update($id, ["image" => $fileName], "candidate_id");
     }
+
+    public function getByPartyId($partyId) {
+        return $this->dao->getByPartyId($partyId);
+    }
+
+    public function getAll() {
+    return $this->dao->getAllCandidates();
+}
+
 }

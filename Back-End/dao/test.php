@@ -13,6 +13,7 @@ $candidatesDao = new CandidatesDao();
 $votesDao = new VotesDao();
 $messagesDao = new ContactMessagesDao();
 
+
 echo "<h3>UsersDao</h3>";
 if (!$usersDao->getAll()) {
     $usersDao->insert([

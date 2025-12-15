@@ -29,7 +29,8 @@ class BaseDao {
         $sql = "INSERT INTO " . $this->table . " ($columns) VALUES ($values)";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute($data);
-        return $this->conn->lastInsertId();
+        $newestID =$this->conn->lastInsertId();
+        return ($this->getById($newestID, "user_id"));
     }
 
     public function update($id, $data, $col = 'id') {
@@ -62,7 +63,7 @@ class BaseDao {
                     v.vote_id,
                     u.full_name AS user_name,
                     c.full_name AS candidate_name,
-                    p.party_name
+                    p.party_name AS party_name
                 FROM votes v
                 JOIN users u ON v.user_id = u.user_id
                 JOIN candidates c ON v.candidate_id = c.candidate_id

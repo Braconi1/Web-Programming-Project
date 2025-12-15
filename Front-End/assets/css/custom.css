@@ -451,43 +451,50 @@ body {
   padding: 60px 20px;
   text-align: center;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .container-vote {
   max-width: 1100px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .vote-title {
   font-size: 2.5rem;
   margin-bottom: 10px;
   color: #2f3542;
+  font-weight: 700;
 }
 
 .vote-subtitle {
   color: #57606f;
   margin-bottom: 40px;
+  font-size: 1.1rem;
 }
-
 
 .party-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 25px;
+  justify-items: center;
 }
-
 
 .party-card {
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   padding: 20px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .party-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
 .party-img {
@@ -496,113 +503,162 @@ body {
   object-fit: cover;
   border-radius: 10px;
   margin-bottom: 15px;
+  background-color: #fafafa;
+  padding: 15px;
+  transition: transform 0.3s ease;
+}
+
+.party-img:hover {
+  transform: scale(1.05);
 }
 
 .party-name {
   font-size: 1.2rem;
   color: #2f3542;
   margin-bottom: 15px;
+  font-weight: 600;
 }
-
 
 .vote-btn {
   background-color: #ff6b01;
   color: #fff;
   border: none;
-  padding: 10px 18px;
-  border-radius: 6px;
+  padding: 10px 20px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .vote-btn:hover {
   background-color: #e65c00;
+  transform: translateY(-2px);
 }
 
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  background-color: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  transition: opacity 0.3s ease;
+}
 
-@media (max-width: 768px) {
-  .vote-title {
-    font-size: 2rem;
-  }
+.modal-content {
+  background-color: #fff;
+  margin: auto;
+  padding: 25px 20px;
+  border-radius: 15px;
+  max-width: 450px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+  transition: all 0.3s ease;
+}
 
-  .party-img {
-    height: 150px;
-  }
+.modal-content h3 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #2f3542;
+}
 
-  .party-name {
-    font-size: 1.1rem;
-  }
+.modal-content select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.modal-content .btn-vote-submit {
+  background: #ff6b01;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.modal-content .btn-vote-submit:hover {
+  background: #e65c00;
+  transform: translateY(-2px);
+}
+
+.modal .close {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  color: #333;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.modal .close:hover {
+  color: #ff6b01;
 }
 
 @media (max-width: 992px) {
   .party-img {
     height: 160px;
   }
+  .party-name {
+    font-size: 1.1rem;
+  }
+  .vote-btn {
+    padding: 9px 18px;
+    font-size: 0.95rem;
+  }
 }
 
 @media (max-width: 768px) {
-  .container.py-5 {
-    padding: 40px 10px;
+  .vote-title {
+    font-size: 2rem;
   }
-
   .party-img {
     height: 150px;
   }
-
-  .card-title {
+  .party-name {
     font-size: 1rem;
   }
-  .login-container {
-    padding: 30px 10px;
+  .vote-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
   }
-
-  .login-card {
-    padding: 30px 20px;
-  }
-
-  .login-card h3 {
-    font-size: 1.8rem;
+  .modal-content {
+    padding: 20px 15px;
   }
 }
 
-@media (min-width: 992px) {
-  .party-card {
-    max-width: 260px;
-    margin: 0 auto;
-  }
-
+@media (max-width: 576px) {
   .party-img {
-    height: 170px;
-    padding: 15px;
-    object-fit: contain;
+    height: 140px;
   }
-
-  .card-title {
-    font-size: 1.1rem;
+  .party-name {
+    font-size: 0.95rem;
   }
-
-  .row.g-4 {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px;
+  .vote-btn {
+    padding: 7px 14px;
+    font-size: 0.85rem;
   }
-
-  .col-12.col-sm-6.col-md-4.col-lg-3 {
-    flex: 0 0 auto;
-    width: auto;
+  .modal-content h3 {
+    font-size: 1.3rem;
   }
 }
 
-@media (min-width: 1200px) {
-  .party-card {
-    max-width: 240px;
-  }
-
-  .party-img {
-    height: 160px;
-  }
-}
 
 #contact {
   background: linear-gradient(135deg, #6a3093 0%, #b24592 100%);
@@ -854,77 +910,511 @@ main, main#spapp {
   background: linear-gradient(135deg, #6a3093 0%, #b24592 100%);
   min-height: 100vh;
   padding: 80px 20px;
-  color:var(--color-text);
+  color: var(--color-text, #fff);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  font-family: 'Poppins', sans-serif;
+  position: relative;
 }
 
+/* ---------- Panel Title ---------- */
 .admin-panel h2 {
-  font-size: 2.2rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 30px;
-  color: var(--color-white);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  margin-bottom: 40px;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
+/* ---------- Dashboard Stats ---------- */
 .admin-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 25px;
   width: 100%;
-  max-width: 900px;
+  max-width: 1000px;
   margin-top: 30px;
 }
 
+/* ---------- Stat Cards ---------- */
 .stat-card {
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-  padding: 25px;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
+  cursor: default;
 }
 
 .stat-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-8px);
   background: rgba(255, 255, 255, 0.25);
 }
 
 .stat-card h3 {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: #ffe8ff;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .stat-card p {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 700;
   color: #fff;
 }
 
+/* ---------- Load Dashboard Button ---------- */
 #loadDashboard {
   background: #fff;
-  color: var(--background-color);
+  color: #b24592;
   border: none;
-  padding: 10px 22px;
+  padding: 12px 26px;
   border-radius: 50px;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.05rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  margin-bottom: 20px;
 }
 
 #loadDashboard:hover {
-  background: var(--color-text);
+  background: #b24592;
   color: #fff;
-  transform: translateY(-3px);
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
 
-#dashboardData {
-  margin-top: 25px;
+/* ---------- Users List ---------- */
+#usersList {
+  margin-top: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 1000px;
+}
+
+/* ---------- Individual User Card ---------- */
+.user-card {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 20px 25px;
+  border-radius: 16px;
+  width: 220px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.user-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.user-card p {
   color: #fff;
+  font-weight: 500;
+  margin-bottom: 12px;
+  font-size: 1rem;
   text-align: center;
-  font-size: 1.2rem;
+}
+
+/* ---------- Buttons inside User Card ---------- */
+.user-card button {
+  background: #fff;
+  color: #6a3093;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 4px 0;
+  width: 90%;
+}
+
+.user-card button:hover {
+  background: #6a3093;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .admin-stats {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+
+  .user-card {
+    width: 180px;
+  }
+}
+
+
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.stat-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.stat-card p {
+    margin: 0;
+    font-size: 42px;
+    font-weight: bold;
+}
+
+/* Modal Overlay */
+.vote-details-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Modal Content */
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    animation: slideUp 0.3s;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Close Button */
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 30px;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-modal:hover {
+    color: #333;
+}
+
+/* Table Styles */
+.vote-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.vote-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.vote-table th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.vote-table tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: background 0.3s;
+}
+
+.vote-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.vote-table td {
+    padding: 12px 15px;
+}
+
+.vote-table tbody tr:first-child {
+    background: #fff3cd;
+    font-weight: bold;
+}
+
+.total-summary {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 20px;
+    padding: 15px;
+    background: #e7f3ff;
+    border-radius: 8px;
+}
+
+/* Role Badges */
+.role-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.role-badge.admin {
+    background: #dc3545;
+    color: white;
+}
+
+.role-badge.user {
+    background: #28a745;
+    color: white;
+}
+
+
+.user-card {
+    background: white;
+    padding: 20px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.user-card button {
+    margin: 5px 5px 0 0;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.resetPasswordBtn {
+    background: #ffc107;
+    color: #333;
+}
+
+.resetPasswordBtn:hover {
+    background: #ffb300;
+}
+
+.deleteUserBtn {
+    background: #dc3545;
+    color: white;
+}
+
+.deleteUserBtn:hover {
+    background: #c82333;
+}
+
+/* Scrollbar Styling */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #764ba2;
+}
+
+
+.modal {
+  display: none; /* hidden by default */
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.7); 
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: auto;
+  padding: 30px 25px;
+  border-radius: 15px;
+  max-width: 450px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.modal-content h3 {
+  margin-bottom: 20px;
+}
+
+.modal-content select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.modal-content .btn-vote-submit {
+  background: #ff6b01;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.modal-content .btn-vote-submit:hover {
+  background: #e65c00;
+}
+
+.modal .close {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  color: #333;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+
+.user-dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* Razmak kad je lijevo pored Revlon */
+.left-user {
+  margin-left: 12px;
+  margin-right: 20px;
+}
+
+/* Ikonica čovječuljka */
+.user-icon {
+  font-size: 20px;
+  color: #ffffff;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background 0.25s ease, transform 0.2s ease;
+}
+
+.user-icon:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(1.05);
+}
+
+/* Dropdown meni */
+.dropdown-menu {
+  position: absolute;
+  top: 48px;
+  left: 0;          /* BITNO: otvara se ulijevo */
+  right: auto;
+  background: #ffffff;
+  border-radius: 12px;
+  min-width: 160px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+  display: none;
+  flex-direction: column;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+/* Prikaz dropdowna */
+.dropdown-menu.show {
+  display: flex;
+}
+
+/* Dugme u dropdownu */
+.dropdown-menu button {
+  background: none;
+  border: none;
+  padding: 12px 16px;
+  width: 100%;
+  text-align: left;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.25s ease;
+}
+
+/* Hover na logout */
+.dropdown-menu button:hover {
+  background: #f2f2f2;
+}
+
+/* Ikonica u dropdownu */
+.dropdown-menu i {
+  color: #6a3093;
+  font-size: 0.95rem;
+}
+
+/* Mobile tweak (sidebar) */
+@media (max-width: 768px) {
+  .left-user {
+    margin-left: 15px;
+    margin-bottom: 10px;
+  }
+
+  .dropdown-menu {
+    top: 42px;
+  }
 }

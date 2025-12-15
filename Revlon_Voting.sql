@@ -38,12 +38,6 @@ CREATE TABLE ContactMessages (
     message TEXT
 );
 
-CREATE TABLE Admins (
-    admin_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL
-);
-
 INSERT INTO Parties (party_name, logo)
 VALUES 
 ('SDA', 'sda.jpg'),
@@ -58,6 +52,3 @@ VALUES
 ('Jasmin Mehić', 'Predsjednik', 3),
 ('Lejla Selimović', 'Predsjednik', 4);
 
-INSERT INTO Admins (username, password)
-VALUES
-('admin', 'admin123');

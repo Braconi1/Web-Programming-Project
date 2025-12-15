@@ -9,15 +9,17 @@
  *     email="elvir.pandur@stu.ibu.edu.ba",
  *     name="Voting System"
  *   )
- * ),
+ * )
+ *
  * @OA\Server(
- *     url= "http://localhost/ElvirPandur/WEB-PROGRAMMING-PROJECT/Back-End",
+ *     url="http://localhost/ElvirPandur/WEB-PROGRAMMING-PROJECT/Back-End",
  *     description="API server"
- * ),
+ * )
+ *
  * @OA\SecurityScheme(
- *     securityScheme="ApiKey",
- *     type="apiKey",
- *     in="header",
- *     name="Authentication"
+ *     securityScheme="bearerAuth",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT"
  * )
  */

@@ -3,31 +3,28 @@
     <h2 class="vote-title">Vote for Your Favorite Party</h2>
     <p class="vote-subtitle">Select one of the political parties below to cast your vote.</p>
 
-    <div class="party-grid">
-      <!-- Example Party -->
-      <div class="party-card">
-        <img src="Front-End/assets/gallery/sda.jpg" alt="SDP" class="party-img">
-        <h3 class="party-name">SDA stranka</h3>
-        <button class="vote-btn">Vote</button>
-      </div>
+    <div class="party-grid" id="partyGrid"></div>
+  </div>
 
-      <div class="party-card">
-        <img src="Front-End/assets/gallery/bps.png" alt="SDA" class="party-img">
-        <h3 class="party-name">Bps Stranka</h3>
-        <button class="vote-btn">Vote</button>
-      </div>
+  <div class="modal" id="voteModal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3>Cast Your Vote</h3>
 
-      <div class="party-card">
-        <img src="Front-End/assets/gallery/sBIH.png" alt="Narod i Pravda" class="party-img">
-        <h3 class="party-name">SBIH Stranka</h3>
-        <button class="vote-btn">Vote</button>
-      </div>
+      <!-- Prikaz slike stranke u modal -->
+      <img id="modalPartyImage" src="" alt="Party Logo" class="party-logo" style="width:120px; height:auto; display:block; margin-bottom:10px;">
 
-      <div class="party-card">
-        <img src="Front-End/assets/gallery/narod_i_pravda.jpg" alt="DF" class="party-img">
-        <h3 class="party-name">Narod i Pravda Stranka</h3>
-        <button class="vote-btn">Vote</button>
-      </div>
+      <!-- Dropdown za stranku (samo prikaz, disabled) -->
+      <select id="partySelect" disabled>
+        <option value="">Select Party</option>
+      </select>
+
+      <!-- Dropdown za kandidata -->
+      <select id="candidateSelect">
+        <option value="">Select Candidate</option>
+      </select>
+
+      <button class="btn-vote-submit" onclick="submitVote()">Submit</button>
     </div>
   </div>
 </section>

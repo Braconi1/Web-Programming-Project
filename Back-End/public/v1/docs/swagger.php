@@ -9,9 +9,10 @@ if($_SERVER['SERVER_NAME'] == 'localhost' || $_SERVER['SERVER_NAME'] == '127.0.0
 }
 
 $openapi = \OpenApi\Generator::scan([
-    __DIR__ . '/doc_setup.php',
-    __DIR__ . '/../../../routes'
+    __DIR__ . '/doc_setup.php',        // Global annotations
+    __DIR__ . '/../../../routes',      // Route-level annotations             // Root-level annotations (CRITICAL FIX)
 ]);
+
 header('Content-Type: application/json');
 echo $openapi->toJson();
 ?>
