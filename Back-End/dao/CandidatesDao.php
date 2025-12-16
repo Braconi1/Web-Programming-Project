@@ -26,5 +26,19 @@ class CandidatesDao extends BaseDao {
     public function getAllCandidates() {
         return $this->getAll();
     }
+
+    public function getByPartyId($partyId) {
+    try {
+        $query = "SELECT * FROM candidates WHERE party_id = :party_id";
+        $stmt = $this->conn->prepare($query); // promijenjeno
+        $stmt->bindValue(":party_id", (int)$partyId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error fetching candidates: " . $e->getMessage());
+        throw $e; // da ruta može vratiti JSON error
+    }
+    }
+
 }
 ?>
