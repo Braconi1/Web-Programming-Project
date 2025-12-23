@@ -81,11 +81,11 @@ function submitVote() {
     const candidateId = document.getElementById("candidateSelect").value;
 
     if (!token) {
-        alert("You must login to vote!");
+        toastr.error("You must login to vote!");
         return;
     }
     if (!candidateId) {
-        alert("Please select a candidate");
+        toastr.error("Please select a candidate");
         return;
     }
 
@@ -108,7 +108,7 @@ function submitVote() {
         return data;
     })
     .then(data => {
-        alert("Vote submitted successfully!");
+        toastr.success("Vote submitted successfully!");
         closeModal();
     })
     .catch(err => {
@@ -270,7 +270,7 @@ $(document).on("click", "#loginBtn", function(e) {
     .then(res => res.json())
     .then(res => {
         if (!res.token) {  // provjerava da li je login uspio
-            alert(res.error || "Invalid login");
+            toastr.error(res.error || "Invalid login");
             return;
         }
 

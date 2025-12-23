@@ -32,7 +32,6 @@ class UsersDao extends BaseDao {
     return $stmt->execute();
     }
 
-
     public function getAllUsers() {
         return $this->getAll();
     }
