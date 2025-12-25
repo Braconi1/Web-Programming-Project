@@ -18,13 +18,11 @@ Flight::group('/candidates', function() {
      *     path="/candidates",
      *     tags={"Candidates"},
      *     summary="Fetch all candidates",
-     *     description="Returns a list of all candidates. JWT token required.",
-     *     security={{"bearerAuth":{}}},
+     *     description="Returns a list of all candidates.",
      *     @OA\Response(
      *         response=200,
      *         description="List of candidates returned"
-     *     ),
-     *     @OA\Response(response=401, description="Unauthorized")
+     *     )
      * )
      */
     Flight::route('GET /', function() use ($service) {
@@ -37,17 +35,14 @@ Flight::group('/candidates', function() {
      *     path="/candidates/{id}",
      *     tags={"Candidates"},
      *     summary="Fetch single candidate",
-     *     description="Returns candidate by ID. JWT token required.",
-     *     security={{"bearerAuth":{}}},
+     *     description="Returns candidate by ID.",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         @OA\Schema(type="integer")
      *     ),
-     *     @OA\Response(response=200, description="Candidate returned"),
-     *     @OA\Response(response=401, description="Unauthorized"),
-     *     @OA\Response(response=403, description="Forbidden")
+     *     @OA\Response(response=200, description="Candidate returned")
      * )
      */
     Flight::route('GET /@id', function($id) use ($service) {
@@ -60,7 +55,7 @@ Flight::group('/candidates', function() {
      *     path="/candidates",
      *     tags={"Candidates"},
      *     summary="Add new candidate",
-     *     description="Creates a new candidate. JWT token required (admin).",
+     *     description="Creates a new candidate. Admin only.",
      *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
@@ -72,10 +67,12 @@ Flight::group('/candidates', function() {
      *         )
      *     ),
      *     @OA\Response(response=200, description="Candidate added"),
-     *     @OA\Response(response=401, description="Unauthorized")
+     *     @OA\Response(response=401, description="Unauthorized"),
+     *     @OA\Response(response=403, description="Forbidden")
      * )
      */
     Flight::route('POST /', function() use ($service) {
+        Flight::auth_middleware()->requireAdmin();
         $data = Flight::request()->data->getData();
         Flight::json($service->add($data));
     });
@@ -86,7 +83,7 @@ Flight::group('/candidates', function() {
      *     path="/candidates/{id}",
      *     tags={"Candidates"},
      *     summary="Update a candidate",
-     *     description="Updates candidate fields. JWT token required (admin).",
+     *     description="Updates candidate fields. Admin only.",
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="id",
@@ -103,10 +100,12 @@ Flight::group('/candidates', function() {
      *         )
      *     ),
      *     @OA\Response(response=200, description="Candidate updated"),
-     *     @OA\Response(response=401, description="Unauthorized")
+     *     @OA\Response(response=401, description="Unauthorized"),
+     *     @OA\Response(response=403, description="Forbidden")
      * )
      */
     Flight::route('PUT /@id', function($id) use ($service) {
+        Flight::auth_middleware()->requireAdmin();
         $data = Flight::request()->data->getData();
         Flight::json($service->update($id, $data, "candidate_id"));
     });
@@ -117,7 +116,7 @@ Flight::group('/candidates', function() {
      *     path="/candidates/{id}",
      *     tags={"Candidates"},
      *     summary="Delete a candidate",
-     *     description="Deletes candidate by ID. JWT token required (admin).",
+     *     description="Deletes candidate by ID. Admin only.",
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="id",
@@ -126,14 +125,16 @@ Flight::group('/candidates', function() {
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Response(response=200, description="Candidate deleted"),
-     *     @OA\Response(response=401, description="Unauthorized")
+     *     @OA\Response(response=401, description="Unauthorized"),
+     *     @OA\Response(response=403, description="Forbidden")
      * )
      */
     Flight::route('DELETE /@id', function($id) use ($service) {
+        Flight::auth_middleware()->requireAdmin();
         Flight::json($service->delete($id, "candidate_id"));
     });
 
-    // ---------- GET CANDIDATES BY PARTY (public, bez JWT) ----------
+    // ---------- GET CANDIDATES BY PARTY (PUBLIC) ----------
     /**
      * @OA\Get(
      *     path="/candidates/party/{partyId}",
@@ -150,15 +151,12 @@ Flight::group('/candidates', function() {
      * )
      */
     Flight::route('GET /party/@partyId', function($partyId) use ($service) {
-    try {
-        error_log("Fetching candidates for partyId: " . $partyId); // DEBUG
-        $candidates = $service->getByPartyId($partyId);
-        Flight::json($candidates);
-    } catch (Exception $e) {
-        error_log("Error in route: " . $e->getMessage()); // DEBUG
-        Flight::json(["error" => $e->getMessage()], 500);
-    }
+        try {
+            $candidates = $service->getByPartyId($partyId);
+            Flight::json($candidates);
+        } catch (Exception $e) {
+            Flight::json(["error" => $e->getMessage()], 500);
+        }
     });
-
 
 });
