@@ -39,14 +39,18 @@ Flight::group('/messages', function() {
      *     path="/messages",
      *     tags={"Contact Messages"},
      *     summary="Get all contact messages",
+     *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
      *         description="List of messages",
      *         @OA\JsonContent(type="array", @OA\Items(type="object"))
-     *     )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthorized"),
+     *     @OA\Response(response=403, description="Forbidden")
      * )
      */
     Flight::route('GET /', function() use ($service) {
+        Flight::auth_middleware()->requireAdmin();
         Flight::json($service->getAllMessages());
     });
 
@@ -55,6 +59,7 @@ Flight::group('/messages', function() {
      *     path="/messages/{id}",
      *     tags={"Contact Messages"},
      *     summary="Delete a message",
+     *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -62,10 +67,13 @@ Flight::group('/messages', function() {
      *         description="ID of the message",
      *         @OA\Schema(type="integer")
      *     ),
-     *     @OA\Response(response=200, description="Message deleted")
+     *     @OA\Response(response=200, description="Message deleted"),
+     *     @OA\Response(response=401, description="Unauthorized"),
+     *     @OA\Response(response=403, description="Forbidden")
      * )
      */
     Flight::route('DELETE /@id', function($id) use ($service) {
+        Flight::auth_middleware()->requireAdmin();
         Flight::json($service->deleteMessage($id));
     });
 });

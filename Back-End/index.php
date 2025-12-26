@@ -56,31 +56,37 @@ Flight::route('/uploads/@filename', function($filename){
 });
 
 Flight::route('/*', function() {
-
     $path = Flight::request()->url;
+    $method = Flight::request()->method;
 
-    if (
-        str_contains($path, 'auth/login') ||
-        str_contains($path, 'auth/register') ||
-        str_contains($path, 'users/login')
-    ) {
-        return true;
+    $publicRoutes = [
+    'POST /users/login',
+    'POST /users/register',
+    'POST /auth/login',
+    'POST /auth/register',
+    'GET /parties',
+    'GET /candidates',
+    'GET /candidates/party/',
+    'GET /votes/candidate/',  
+    'POST /messages', 
+    'GET /uploads/'
+    ];
+
+    $currentRoute = "$method $path";
+
+    // Provjeri da li je ruta public
+    foreach ($publicRoutes as $publicRoute) {
+        if (strpos($currentRoute, $publicRoute) === 0) {
+            return true;
+        }
     }
 
-    $authHeader = Flight::request()->getHeader("Authorization");
-
-    if (!$authHeader) {
-        Flight::halt(401, "Missing Authorization header");
+    // Ako nije public, provjeri token
+    try {
+        Flight::auth_middleware()->verifyToken();
+    } catch (Exception $e) {
+        Flight::halt(401, json_encode(["error" => "Authentication required"]));
     }
-
-    $parts = explode(" ", $authHeader);
-    $token = $parts[1] ?? null;
-
-    if (!$token) {
-        Flight::halt(401, "Invalid Authorization header format");
-    }
-
-    Flight::auth_middleware()->verifyToken($token);
 });
 
 
