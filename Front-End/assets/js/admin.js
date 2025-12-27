@@ -1,64 +1,38 @@
-//Admin-Panel logika
 $(document).ready(function () {
 
-    // Jwt TOKEN HELPER
-    function getAuthHeaders() {
-        const token = localStorage.getItem("jwt");
-        if (!token) {
-            toastr.error("You are not authorized. Please login.");
-            window.location.href = "login.html"; 
-            return null;
-        }
-        return {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-        };
-    }
-
-    // Load Dashboard 
+    // Load Dashboard using services
     $(document).on("click", "#loadDashboard", function () {
         loadStats();
         loadUsers();
     });
 
-    // Load Stats 
     function loadStats() {
-        const headers = getAuthHeaders();
-        if (!headers) return;
-
-        $.when(
-            $.ajax({
-                url: 'http://localhost/ElvirPandur/WEB-PROGRAMMING-PROJECT/Back-End/users',
-                headers: headers
-            }),
-            $.ajax({
-                url: 'http://localhost/ElvirPandur/WEB-PROGRAMMING-PROJECT/Back-End/candidates',
-                headers: headers
-            }),
-            $.ajax({
-                url: 'http://localhost/ElvirPandur/WEB-PROGRAMMING-PROJECT/Back-End/votes',
-                headers: headers
-            })
-        ).done(function (users, candidates, votes) {
-            $("#totalUsers").text(users[0].length);
-            $("#totalCandidates").text(candidates[0].length);
-            $("#totalVotes").text(votes[0].length);
+        Promise.all([
+            userService.getAllUsers(),
+            candidateService.getAllCandidates(),
+            voteService.getAllVotes()
+        ])
+        .then(([users, candidates, votes]) => {
+            $("#totalUsers").text(users.length);
+            $("#totalCandidates").text(candidates.length);
+            $("#totalVotes").text(votes.length);
             
             // Store data for detailed views
             window.statsData = {
-                users: users[0],
-                candidates: candidates[0],
-                votes: votes[0]
+                users: users,
+                candidates: candidates,
+                votes: votes
             };
-        }).fail(function (err) {
+        })
+        .catch(err => {
             console.error("Error loading stats:", err);
+            toastr.error("Failed to load statistics");
         });
     }
 
-    // Show Vote Details 
     $(document).on("click", "#totalVotes", function() {
         if (!window.statsData) {
-            alert("Please load dashboard first!");
+            toastr.error("Please load dashboard first!");
             return;
         }
 
@@ -69,7 +43,7 @@ $(document).ready(function () {
         candidates.forEach(c => {
             voteCounts[c.candidate_id] = {
                 name: c.full_name,
-                party: c.party_name,
+                party: c.party_name || "N/A",
                 count: 0
             };
         });
@@ -96,20 +70,19 @@ $(document).ready(function () {
         const totalVotes = votes.length;
         sorted.forEach(([id, data], index) => {
             let percentage = 0;
+            if (totalVotes > 0) {
+                percentage = (data.count / totalVotes) * 100;
+                percentage = percentage.toFixed(1);
+            }
 
-        if (totalVotes > 0) {
-            percentage = (data.count / totalVotes) * 100;
-            percentage = percentage.toFixed(1);
-        }
-
-        html += `
-            <tr>
+            html += `
+                <tr>
                     <td>${index + 1}</td>
                     <td>${data.name}</td>
                     <td>${data.party}</td>
                     <td>${data.count}</td>
                     <td>${percentage}%</td>
-            </tr>
+                </tr>
             `;
         });
 
@@ -119,10 +92,9 @@ $(document).ready(function () {
         $("body").append(html);
     });
 
-    // Show User Details 
     $(document).on("click", "#totalUsers", function() {
         if (!window.statsData) {
-            alert("Please load dashboard first!");
+            toastr.error("Please load dashboard first!");
             return;
         }
 
@@ -152,7 +124,6 @@ $(document).ready(function () {
         $("body").append(html);
     });
 
-    // Show Candidate Details 
     $(document).on("click", "#totalCandidates", function() {
         if (!window.statsData) {
             toastr.error("Please load dashboard first!");
@@ -166,13 +137,14 @@ $(document).ready(function () {
         html += '<span class="close-modal">&times;</span>';
         html += '<h3>Candidate List</h3>';
         html += '<table class="vote-table">';
-        html += '<thead><tr><th>Name</th></tr></thead>';
+        html += '<thead><tr><th>Name</th><th>Position</th></tr></thead>';
         html += '<tbody>';
 
         candidates.forEach(c => {
             html += `
                 <tr>
                     <td>${c.full_name}</td>
+                    <td>${c.position || "N/A"}</td>
                 </tr>
             `;
         });
@@ -183,22 +155,15 @@ $(document).ready(function () {
         $("body").append(html);
     });
 
-    // Close Modal 
     $(document).on("click", ".close-modal, .vote-details-modal", function(e) {
         if (e.target === this) {
             $(".vote-details-modal").remove();
         }
     });
 
-    // Load Users 
     function loadUsers() {
-        const headers = getAuthHeaders();
-        if (!headers) return;
-
-        $.ajax({
-            url: 'http://localhost/ElvirPandur/WEB-PROGRAMMING-PROJECT/Back-End/users',
-            headers: headers,
-            success: function (users) {
+        userService.getAllUsers()
+            .then(users => {
                 $("#usersList").empty();
                 users.forEach(function (user) {
                     const userCard = $(`
@@ -211,56 +176,48 @@ $(document).ready(function () {
                     `);
                     $("#usersList").append(userCard);
                 });
-            },
-            error: function (err) {
-                toastr.error("Error loading users:", err);
-            }
-        });
+            })
+            .catch(err => {
+                console.error("Error loading users:", err);
+                toastr.error("Failed to load users");
+            });
     }
 
-    // Reset Password 
     $(document).on("click", ".resetPasswordBtn", function () {
         const userId = $(this).data("id");
         const newPassword = prompt("Enter new password:");
+        
         if (!newPassword) return;
 
-        const headers = getAuthHeaders();
-        if (!headers) return;
+        // CLIENT-SIDE VALIDATION
+        const validation = ValidationHelper.validatePassword(newPassword);
+        if (!validation.isValid) {
+            toastr.error(validation.message);
+            return;
+        }
 
-        $.ajax({
-            url: `http://localhost/ElvirPandur/WEB-PROGRAMMING-PROJECT/Back-End/users/${userId}/reset-password`,
-            type: "PUT",
-            headers: headers,
-            data: JSON.stringify({ password: newPassword }),
-            success: function (res) {
+        userService.resetPassword(userId, newPassword)
+            .then(res => {
                 toastr.success(res.message || "Password reset successful");
-            },
-            error: function (err) {
-                toastr.error("Error resetting password:", err);
-            }
-        });
+            })
+            .catch(err => {
+                toastr.error(err.message || "Failed to reset password");
+            });
     });
 
-    // Delete User 
     $(document).on("click", ".deleteUserBtn", function () {
         const userId = $(this).data("id");
         
         if (!confirm("Are you sure you want to delete this user?")) return;
 
-        const headers = getAuthHeaders();
-        if (!headers) return;
-
-        $.ajax({
-            url: `http://localhost/ElvirPandur/WEB-PROGRAMMING-PROJECT/Back-End/users/${userId}`,
-            type: "DELETE",
-            headers: headers,
-            success: function (res) {
+        userService.deleteUser(userId)
+            .then(res => {
                 toastr.success("User deleted successfully");
                 loadUsers(); // Reload list
-            },
-            error: function (err) {
+            })
+            .catch(err => {
                 console.error("Error deleting user:", err);
-            }
-        });
+                toastr.error("Failed to delete user");
+            });
     });
 });
