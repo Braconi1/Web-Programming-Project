@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__ . '/../services/ValidationService.php';
 
 /**
  * @OA\Tag(
@@ -30,11 +30,27 @@
  *         )
  *     ),
  *     @OA\Response(response=200, description="Login successful"),
+ *     @OA\Response(response=400, description="Validation error"),
  *     @OA\Response(response=401, description="Invalid credentials")
  * )
  */
 Flight::route("POST /users/login", function() {
     $data = Flight::request()->data->getData();
+    
+    // SERVER-SIDE VALIDATION
+    $validation = ValidationService::validateUserLogin($data);
+    
+    if (!$validation['valid']) {
+        Flight::json([
+            'error' => 'Validation failed',
+            'details' => $validation['errors']
+        ], 400);
+        return;
+    }
+    
+    // Sanitize input
+    $data = ValidationService::sanitizeData($data);
+    
     Flight::json(Flight::auth_service()->login($data));
 });
 
@@ -48,8 +64,9 @@ Flight::route("POST /users/login", function() {
  *     @OA\RequestBody(
  *         required=true,
  *         @OA\JsonContent(
- *             required={"full_name","email","password"},
+ *             required={"full_name","jmbg","email","password"},
  *             @OA\Property(property="full_name", type="string", example="John Doe"),
+ *             @OA\Property(property="jmbg", type="string", example="1234567890123"),
  *             @OA\Property(property="email", type="string", example="john@example.com"),
  *             @OA\Property(property="password", type="string", example="mypassword")
  *         )
@@ -60,7 +77,22 @@ Flight::route("POST /users/login", function() {
  */
 Flight::route("POST /users/register", function() {
     $data = Flight::request()->data->getData();
+    
+    // SERVER-SIDE VALIDATION
+    $validation = ValidationService::validateUserRegistration($data);
+    
+    if (!$validation['valid']) {
+        Flight::json([
+            'error' => 'Validation failed',
+            'details' => $validation['errors']
+        ], 400);
+        return;
+    }
+    
+    // Sanitize input
+    $data = ValidationService::sanitizeData($data);
     $data["role"] = "user"; 
+    
     Flight::json(Flight::users_service()->registerUser($data));
 });
 
@@ -141,6 +173,7 @@ Flight::group('/users', function () {
      *         )
      *     ),
      *     @OA\Response(response=200, description="User updated"),
+     *     @OA\Response(response=400, description="Validation error"),
      *     @OA\Response(response=401, description="Unauthorized"),
      *     @OA\Response(response=403, description="Forbidden")
      * )
@@ -148,7 +181,30 @@ Flight::group('/users', function () {
     Flight::route('PUT /@id', function($id) {
         $decoded = Flight::auth_middleware()->verifyToken();
         if ($decoded->id != $id) Flight::auth_middleware()->authorizeRole('admin');
+        
         $data = Flight::request()->data->getData();
+        
+        // Validate email if provided
+        if (isset($data['email'])) {
+            $emailValidation = ValidationService::validateEmail($data['email']);
+            if (!$emailValidation['valid']) {
+                Flight::json(['error' => $emailValidation['error']], 400);
+                return;
+            }
+        }
+        
+        // Validate password if provided
+        if (isset($data['password']) && !empty($data['password'])) {
+            $passwordValidation = ValidationService::validatePassword($data['password']);
+            if (!$passwordValidation['valid']) {
+                Flight::json(['error' => $passwordValidation['error']], 400);
+                return;
+            }
+        }
+        
+        // Sanitize input
+        $data = ValidationService::sanitizeData($data);
+        
         Flight::json(Flight::users_service()->updateUser($id, $data));
     });
 
@@ -173,6 +229,7 @@ Flight::group('/users', function () {
      *         )
      *     ),
      *     @OA\Response(response=200, description="Password reset successful"),
+     *     @OA\Response(response=400, description="Validation error"),
      *     @OA\Response(response=401, description="Unauthorized"),
      *     @OA\Response(response=403, description="Forbidden")
      * )
@@ -182,8 +239,12 @@ Flight::group('/users', function () {
         Flight::auth_middleware()->authorizeRole('admin');
 
         $data = Flight::request()->data->getData();
-        if (!isset($data['password']) || empty($data['password'])) {
-            Flight::halt(400, json_encode(["error" => "Password is required"]));
+        
+        // Validate password
+        $passwordValidation = ValidationService::validatePassword($data['password'] ?? '');
+        if (!$passwordValidation['valid']) {
+            Flight::json(['error' => $passwordValidation['error']], 400);
+            return;
         }
 
         $hashed = password_hash($data['password'], PASSWORD_BCRYPT);
@@ -216,17 +277,14 @@ Flight::group('/users', function () {
      * )
      */
     Flight::route('DELETE /@id', function($id) {
-    $decoded = Flight::auth_middleware()->verifyToken();
-    Flight::auth_middleware()->authorizeRole('admin');
+        $decoded = Flight::auth_middleware()->verifyToken();
+        Flight::auth_middleware()->authorizeRole('admin');
 
-    $success = Flight::users_service()->deleteUser($id);
-    if ($success) {
-        Flight::json(["message" => "User deleted successfully"]);
-    } else {
-        Flight::halt(404, json_encode(["error" => "User not found"]));
-    }
-});
-
-
-
+        $success = Flight::users_service()->deleteUser($id);
+        if ($success) {
+            Flight::json(["message" => "User deleted successfully"]);
+        } else {
+            Flight::halt(404, json_encode(["error" => "User not found"]));
+        }
+    });
 });

@@ -1,18 +1,19 @@
-// Base URL ka backendu
+// Base URL 
 const BASE_URL = "http://localhost/ElvirPandur/WEB-PROGRAMMING-PROJECT/Back-End";
 
-
-// DOM UCITAVANJE FUKCIJA
+// DOM LOADING FUNCTIONS
 document.addEventListener("DOMContentLoaded", () => {
     loadParties();
 });
 
 function loadParties() {
-    fetch(`${BASE_URL}/parties`)
-        .then(res => res.json())
+    partyService.getAllParties()
         .then(data => {
             const grid = document.getElementById("partyGrid");
+            if (!grid) return;
+            
             grid.innerHTML = "";
+            
             data.forEach(party => {
                 const card = document.createElement("div");
                 card.className = "party-card";
@@ -24,7 +25,10 @@ function loadParties() {
                 grid.appendChild(card);
             });
         })
-        .catch(err => console.error("Error loading parties:", err));
+        .catch(err => {
+            console.error("Error loading parties:", err);
+            toastr.error("Failed to load parties");
+        });
 }
 
 let selectedPartyId = null;
@@ -32,38 +36,36 @@ let selectedPartyId = null;
 function openModal(partyId, partyName, partyLogo) {
     const token = localStorage.getItem("jwt");
     if (!token) {
-        alert("You must login to vote!");
+        toastr.error("You must login to vote!");
+        window.location.hash = "#login";
         return;
     }
 
     selectedPartyId = partyId;
 
-    // Postavi sliku i ime stranke u modal
+    // Set party image and name in modal
     document.getElementById("modalPartyImage").src = `${BASE_URL}/uploads/${partyLogo}`;
     const partySelect = document.getElementById("partySelect");
     partySelect.innerHTML = `<option value="${partyId}">${partyName}</option>`;
 
-    // Reset dropdown kandidata
+    // Reset candidate dropdown
     const candidateSelect = document.getElementById("candidateSelect");
     candidateSelect.innerHTML = `<option value="">Select Candidate</option>`;
 
-    // Fetch kandidata za izabranu stranku
-    fetch(`${BASE_URL}/candidates/party/${partyId}`)
-    .then(res => {
-        if (!res.ok) throw new Error("Failed to load candidates");
-        return res.json();
-    })
-    .then(candidates => {
-        console.log("Candidates:", candidates);
-        candidates.forEach(c => {
-            const option = document.createElement("option");
-            option.value = c.candidate_id;
-            option.textContent = c.full_name;
-            candidateSelect.appendChild(option);
+    // Fetch candidates using CandidateService
+    candidateService.getCandidatesByParty(partyId)
+        .then(candidates => {
+            candidates.forEach(c => {
+                const option = document.createElement("option");
+                option.value = c.candidate_id;
+                option.textContent = c.full_name;
+                candidateSelect.appendChild(option);
+            });
+        })
+        .catch(err => {
+            console.error("Error loading candidates:", err);
+            toastr.error("Failed to load candidates");
         });
-    })
-    .catch(err => console.error("Error loading candidates:", err));
-
 
     document.getElementById("voteModal").style.display = "flex";
 }
@@ -72,75 +74,54 @@ function closeModal() {
     document.getElementById("voteModal").style.display = "none";
 }
 
+
 window.onclick = function(e) {
     if (e.target == document.getElementById("voteModal")) closeModal();
 }
 
 function submitVote() {
-    const token = localStorage.getItem("jwt");
     const candidateId = document.getElementById("candidateSelect").value;
 
-    if (!token) {
-        toastr.error("You must login to vote!");
-        return;
-    }
-    if (!candidateId) {
-        toastr.error("Please select a candidate");
+    // CLIENT-SIDE VALIDATION
+    const validation = ValidationHelper.validateCandidateSelection(candidateId);
+    if (!validation.isValid) {
+        toastr.error(validation.message);
         return;
     }
 
-    fetch(`${BASE_URL}/votes`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({ candidate_id: candidateId })
-    })
-    .then(async res => {
-        let data;
-        try {
-            data = await res.json(); // pokušava parsirati JSON
-        } catch {
-            data = null; // ako nije JSON, ostaje null
-        }
-        if (!res.ok) throw new Error(data?.error || "Failed to submit vote");
-        return data;
-    })
-    .then(data => {
-        toastr.success("Vote submitted successfully!");
-        closeModal();
-    })
-    .catch(err => {
-        toastr.error(err.message || "You have already voted");
-    });
+    voteService.submitVote(candidateId)
+        .then(data => {
+            toastr.success("Vote submitted successfully!");
+            closeModal();
+        })
+        .catch(err => {
+            toastr.error(err.message || "Failed to submit vote");
+        });
 }
 
-
-
 $(document).ready(function() {
+    $("main#spapp > section").height($(document).height() - 60);
 
-  $("main#spapp > section").height($(document).height() - 60);
+    var app = $.spapp({
+        defaultView: "home",  
+        pageNotFound: "error_404",
+        templateDir: "Front-End/tpl/" 
+    });
 
-  var app = $.spapp({
-    defaultView: "home",  
-    pageNotFound: "error_404",
-    templateDir: "Front-End/tpl/" 
-  });
+    app.route({ view: "home", load: "home.html" });
+    app.route({ view: "vote", load: "vote.html" });
+    app.route({ view: "about", load: "about.html" });
+    app.route({ view: "stranke", load: "stranke.html" });
+    app.route({ view: "contact", load: "contact.html" });
+    app.route({ view: "login", load: "login.html" });
+    app.route({ view: "sign-up", load: "sign-up.html" });
+    app.route({ view: "admin-panel", load: "admin-panel.html" });
 
-  app.route({ view: "home", load: "home.html" });
-  app.route({ view: "vote", load: "vote.html" });
-  app.route({ view: "about", load: "about.html" });
-  app.route({ view: "stranke", load: "stranke.html" });
-  app.route({ view: "contact", load: "contact.html" });
-  app.route({ view: "login", load: "login.html" });
-  app.route({ view: "sign-up", load: "sign-up.html" });
-  app.route({ view: "admin-panel", load: "admin-panel.html" });
+    app.run();
+    updateAuthUI();
 
-  app.run();
-  updateAuthUI();
-
-  $(window).on('hashchange', function() {
+    // Reload parties when navigating to vote page
+    $(window).on('hashchange', function() {
         const currentView = window.location.hash.replace('#', '');
         if (currentView === 'vote') {
             setTimeout(function() {
@@ -151,6 +132,7 @@ $(document).ready(function() {
         }
     });
     
+    // Initial load if on vote page
     if (window.location.hash === '#vote') {
         setTimeout(function() {
             if (document.getElementById('partyGrid')) {
@@ -173,9 +155,6 @@ function updateAuthUI() {
     }
 }
 
-
-//acciount looging out
-
 $(document).on("click", ".user-icon", function (e) {
     e.stopPropagation();
     $("#userMenu").toggleClass("show");
@@ -188,7 +167,7 @@ $(document).on("click", function () {
 $(document).on("click", "#logoutBtn", function () {
     localStorage.removeItem("jwt");
     localStorage.removeItem("user");
-
+    
     updateAuthUI();
     toastr.success("You have successfully logged out");
     window.location.hash = "#login";

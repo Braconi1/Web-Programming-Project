@@ -1,20 +1,13 @@
 # Web-Programming-Project
 
+🌐 online WEB aplication: https://revlon-voting.infinityfreeapp.com
+________________________________________________________________
 
 Milestone 1 - Done
 Milestone 2 - Done
 Milestone 3 - Done
 Milestone 4 - Done
-
-
-moram izbrisati dashdao route i dao folder i servis
-
-putem base dao moram implementirati funkciju koja count broji id od usera 
-
-zatim u admin dao koji koristi to i prikazuje koliko je ljudi glasalo
-
-zatim amni routes tjs pozvati da vidimo koliko je usera glasalo
-
+Milestone 5 - Done
 
 Voting System
 
@@ -45,3 +38,5 @@ The Voting System project is a web-based application designed to allow users to 
 
 
 Sql DataBase is updated v2
+
+Done by: Elvir Pandur
